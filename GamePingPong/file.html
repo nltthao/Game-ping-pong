@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Game Ping Pong</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        canvas {
+            background-color: white;
+            display: block;
+            margin:50px  auto;
+
+        }
+
+        #start button:hover{
+
+            color: antiquewhite;
+        }
+        body{
+
+            background-image: url("im.gif");
+        }
+
+        .item {
+            padding: 1rem;
+            text-align: center;
+            color: #fff;
+        }
+
+        .item1 { background-color: #fd8471; }
+        .item2 { background-color: #68e972; }
+        .item3 { background-color: #64e0d5; }
+        .item4 { background-color: #67a1eb; }
+        .item5 { background-color: #7267ea; }
+        .item6 { background-color: #cc67eb; }
+
+        .screen {
+            display: grid;
+            grid-template-columns: 200px 200px 200px;
+            grid-template-rows: 100px 100px 100px;
+        }
+
+
+    </style>
+
+</head>
+<body>
+
+
+<div id="start" class="screen" style="display: block">
+    <button onclick="startGame()" id="letgo" class="item item1" >Start Game</button>
+    <button onclick="nextlevel1()" id="next1" class="item item2" >Level 1</button>
+    <button onclick="nextlevel2()" id="next2" class="item item3">level 2</button>
+    <button onclick="nextlevel3()" id="next3" class="item item4">level 3</button>
+    <button onclick="nextlevel4()" id="next4" class="item item5">level 4</button>
+</div>
+
+
+<canvas id="game" style=" display: none" width="580" height="320">
+
+
+</canvas>
+
+<script>
+    var canvas = document.getElementById("game");
+    var ctx = canvas.getContext("2d");
+
+
+    var x = canvas.width / 2;
+    var y = canvas.height - 30;
+    var dx = 2;
+    var dy = -2;
+    // bong
+    var ballRadius = 10;
+    //thanh truot
+    var paddheight = 10;
+    var paddwidth = 120;
+    var paddleX = (canvas.width - paddwidth) / 2;// khoang cach giua 2 ben khung choi và thanh truot và dưa thanh vào giua
+    var right = false;
+    var left = false;
+    // vien gach
+    var brickRowCount = 3;
+    var brickColumCount = 5;
+    var brickWidth = 75;
+    var brickHeight = 20;
+    var brickPadding = 10;
+    var bricktop = 30;
+    var brickleft = 15;
+
+    var bricks = [];
+    // tinh diem
+    var score = 0;
+    // luot choi
+    var lives = 10;
+
+    let brickSpeed = 3; // toc do vien gach
+    var bricks =[];
+
+        for (c = 0; c < brickColumCount; c++) {// chua vi tri x y de ve vien gach
+            bricks[c] = [];
+            for (r = 0; r < brickRowCount; r++) {
+                bricks[c][r] = {x: 0, y: 0, status: 1};
+            }
+        }
+
+        function keyDownH(e) {
+            if (e.keyCode == 39) {// mui ten phai
+                right = true;
+            } else if (e.keyCode == 37) {// trai
+                left = true;
+            }
+        }
+
+        function mouseMoveH(e) {
+            var reX = e.clientX - canvas.offsetLeft;// tinh toa do x cua mouse so voi canh trai cua canvas
+            if (reX > 0 && reX < canvas.width) {// ktr co nam trong gioi hang cua khung hay khong
+                paddleX = reX - paddwidth / 2;//dat vi tri cua thanh truot tren truc x thanh toa do x cua con tro chuot - đi 1 nữa chieu rong thanh truot
+            }// can giua thanh truot  ở duoi con tro chuot
+
+        }
+
+        function keyUpH(e) {
+            if (e.keyCode == 39) {
+                right = false;
+            } else if (e.keyCode == 37) {
+                left = false;
+            }
+
+        }
+
+    function startGame() {// button start game
+        let  startDiv = document.getElementById("letgo");
+        let gameCanvas = document.getElementById("game");
+        startDiv.style.display ="none";
+        gameCanvas.style.display =" block";
+
+        let  startDiv1 = document.getElementById("next1");
+        startDiv1.style.display ="none";
+
+        let  startDiv2 = document.getElementById("next2");
+        startDiv2.style.display ="none";
+
+        let  startDiv3 = document.getElementById("next3");
+        startDiv3.style.display ="none";
+        let  startDiv4 = document.getElementById("next4");
+        startDiv4.style.display ="none";
+    }
+    function nextlevel1() {//button level1
+        let  startDiv1 = document.getElementById("next1");
+        let gameCanvas1 = document.getElementById("game");
+        startDiv1.style.display ="none";
+        gameCanvas1.style.display =" block";
+
+        let  startDiv = document.getElementById("letgo");
+        startDiv.style.display ="none";
+
+        let  startDiv2 = document.getElementById("next2");
+        startDiv2.style.display ="none";
+
+        let  startDiv3 = document.getElementById("next3");
+        startDiv3.style.display ="none";
+        let  startDiv4 = document.getElementById("next4");
+        startDiv4.style.display ="none";
+    }
+    function nextlevel2() {// button level2
+        let  startDiv2 = document.getElementById("next2");
+        let gameCanvas2 = document.getElementById("game");
+        startDiv2.style.display ="none";
+        gameCanvas2.style.display =" block";
+
+        let  startDiv = document.getElementById("letgo");
+        startDiv.style.display ="none";
+
+        let  startDiv1 = document.getElementById("next1");
+        startDiv1.style.display ="none";
+        let  startDiv3 = document.getElementById("next3");
+        startDiv3.style.display ="none";
+        let  startDiv4 = document.getElementById("next4");
+        startDiv4.style.display ="none";
+    }
+    function nextlevel3() {// button level 3
+        let  startDiv3 = document.getElementById("next3");
+        let gameCanvas2 = document.getElementById("game");
+        startDiv3.style.display ="none";
+        gameCanvas2.style.display =" block";
+
+        let  startDiv = document.getElementById("letgo");
+        startDiv.style.display ="none";
+
+        let  startDiv1 = document.getElementById("next1");
+        startDiv1.style.display ="none";
+
+
+        let  startDiv2 = document.getElementById("next2");
+        startDiv2.style.display ="none";
+
+        let  startDiv4 = document.getElementById("next4");
+        startDiv4.style.display ="none";
+    }
+    function nextlevel4() {// button level 4
+        let  startDiv4 = document.getElementById("next4");
+        let gameCanvas2 = document.getElementById("game");
+        startDiv4.style.display ="none";
+        gameCanvas2.style.display =" block";
+        let  startDiv3 = document.getElementById("next3");
+        startDiv3.style.display ="none";
+
+        let  startDiv2 = document.getElementById("next2");
+        startDiv2.style.display ="none";
+        let  startDiv = document.getElementById("letgo");
+        startDiv.style.display ="none";
+
+        let  startDiv1 = document.getElementById("next1");
+        startDiv1.style.display ="none";
+    }
+
+
+
+
+
+
+    function drawPaddle() {// thanh truot
+        ctx.beginPath()
+        ctx.rect(paddleX, canvas.height - paddheight, paddwidth, paddheight);
+        ctx.fillStyle = "black";
+        ctx.fill();
+        ctx.closePath();
+        // di chuyen ban phim sang trai, phai
+        document.addEventListener("keydown", keyDownH, false);
+        document.addEventListener("keyup", keyUpH, false);
+
+
+// cong thuc di chuyen thanh truot
+
+        if (right && paddleX < canvas.width - paddwidth) {// kiem tra neu phim mui ten phai duoc nhan và thanh truot chưa den canh phai cua canvas thì toa do x cua thanh truot duoc tang len 7
+            paddleX += 7;
+        } else if (left && paddleX > 0) {// ngược lại khi phim mui ten trai duoc nhan và thanh truot chưa den canh trai cua canvas thì gia tri toa do x giam 7
+            paddleX -= 7;
+        }
+    }
+
+    function drawBall() {// ham tao bong
+        ctx.beginPath()
+        ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+        ctx.fillStyle = "black";
+        ctx.fill();
+        ctx.closePath();
+
+    }
+
+    document.addEventListener("mousemove", mouseMoveH, false);
+
+    function drawScore() {// ham the hien điem
+            ctx.font = "20px Brush Script MT";
+            ctx.fillStyle = "red";
+            ctx.fillText("Score: " + score, 8, 20)
+
+        }
+
+    function drawLives() {// ham the hien mang (luot choi)
+        ctx.font = "20px Brush Script MT";
+        ctx.fillStyle = "red";
+        ctx.fillText("Lives: "+lives, canvas.width-65, 20);
+    }
+
+        function drawBricks() {// ve mang gach
+            for (c = 0; c < brickColumCount; c++) {
+                for (r = 0; r < brickRowCount; r++) {
+                    if (bricks[c][r].status ==1) {
+                        var brickX = (c * (brickWidth + brickPadding)) + brickleft;
+                        var brickY = (r * (brickHeight + brickPadding)) + bricktop;
+
+                        bricks[c][r].x = brickX;
+                        bricks[c][r].y = brickY;
+                        ctx.beginPath();
+                        ctx.rect(brickX, brickY, brickWidth, brickHeight);
+                        ctx.fillStyle = "#FF8C00";
+                        ctx.fill();
+                        ctx.closePath();
+                    }
+                }
+            }
+        }
+
+    function moveBrick() {// vien gach di chuyen qua lại
+        brickleft += brickSpeed;// tang vị tri nam ngang cua gach theo tốc đo cua vien gach
+        if (brickleft + brickWidth > canvas.width || brickleft < 0) {//kiem tra xe vien gach cham tơi cạnh trái hay phải của  canvas
+            brickSpeed = -brickSpeed;// nếu có thì đổi hướng và di chuyen nguoc lai
+        }
+
+
+
+    }
+
+    var powerUp = {//hop qua
+        x: 120,
+        y: 120,
+        width: 35,
+        height: 35,
+
+        dy: 2,
+        status: 1 // 1: power up chưa bị ăn, 0: power up đã bị ăn
+    };
+    function drawPowerUp() {
+        if (powerUp.status == 1) {
+            ctx.beginPath();
+
+            var img = new Image();
+
+            img.onload = function(){
+                ctx.drawImage(img, powerUp.x, powerUp.y,powerUp.width,powerUp.height);
+            };
+            img.src = "hq.png";
+            ctx.fillStyle = "#FF0000";
+            ctx.fill();
+            ctx.closePath();
+        }
+
+    }
+    function collDetection() {// xu li va cham giua vien gach va bong
+        for (c = 0; c < brickColumCount; c++) {
+            for (r = 0; r < brickRowCount; r++) {
+                var b = bricks[c][r];
+                if (b.status == 1) {
+                    //ktr xem bóng co va cham voi gach hien tai hay khong
+                    // so sánh toa do x, y cua bong với các x, y và chieu rong và chieu cao cua vien gach
+                    if (x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {
+
+                        dy = -dy;// doi huong cua bong khi va cham
+
+                        b.status = 0;//danh dau vien gach bi pha huy
+                        score++;// cong 1 diem khi bong cham gach
+
+                        if (score == brickColumCount * brickRowCount) {// đe thang game thì so diem = so gach hang * so gach cot
+
+                            alert("YOU WIN, CONGRATULATIONS!");
+                            document.location.reload();
+
+                        }
+                    }
+
+
+                }
+            }
+        }
+
+    }
+
+    var hit = 0;
+    var maxhit= 2;
+    function collDetection2() {//level2
+        for (c = 0; c < brickColumCount; c++) {
+            for (r = 0; r < brickRowCount; r++) {
+                var b = bricks[c][r];
+                if (b.status == 1) {
+                    //ktr xem bóng co va cham voi gach hien tai hay khong
+                    // so sánh toa do x, y cua bong với các x, y và chieu rong và chieu cao cua vien gach
+                    if (x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {
+                        dy = -dy;
+
+                        hit += 1;// khi bong cham lan 1 thi so hit tang len 1
+                        if (hit == maxhit) {// neu so hit = maxhit thi gach moi duoc bien mat và cong diem
+                            score++;
+                            b.status = -1;
+                            hit = 0;
+                        }
+
+                        if (score == brickColumCount * brickRowCount) {
+
+                            alert("YOU WIN, CONGRATULATIONS!");
+                            document.location.reload();
+                        }
+
+
+                    }
+                }
+
+
+            }
+        }
+
+
+
+
+    }
+    function collDetection3() {//level3
+        for (c = 0; c < brickColumCount; c++) {
+            for (r = 0; r < brickRowCount; r++) {
+                var b = bricks[c][r];
+
+                if (b.status == 1) {
+                    //ktr xem bóng co va cham voi gach hien tai hay khong
+                    // so sánh toa do x, y cua bong với các x, y và chieu rong và chieu cao cua vien gach
+                    if (x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {
+                        dy = -dy;// doi huong cua bong khi va cham
+
+
+                        if (score == brickColumCount * brickRowCount) {
+
+                            alert("YOU WIN, CONGRATULATIONS!");
+                            document.location.reload();
+
+                        }
+
+
+                    }
+                }else if (b.status != 1) {//neu status khong =1 thi khi bong cham vao gach k bien mat, tro thanh 1 buc tuong gạch
+                    if (x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {
+                        dy = -dy;
+                    }
+                }
+
+
+            }
+        }
+
+
+    }
+    function drawBricks1() {// ve tuong gach //level3
+        for (c = 0; c < brickColumCount; c++) {
+            for (r = 0; r < brickRowCount; r++) {
+                if (bricks[c][r].status != 1) {//tạo ra mang gach bong khong the pha huy
+                    var brickX = (c * (brickWidth + brickPadding+20)) + brickleft+20;
+                    var brickY = (r * (brickHeight + brickPadding+20)) + bricktop+20;
+
+                    bricks[c][r].x = brickX;
+                    bricks[c][r].y = brickY;
+                    ctx.beginPath();
+                    ctx.rect(brickX, brickY, brickWidth, brickHeight);
+                    ctx.fillStyle = "black";
+
+                    ctx.fill();
+                    ctx.closePath();
+                }
+            }
+        }
+    }
+    function collDetection4() {//của level 4
+        for (c = 0; c < brickColumCount; c++) {
+            for (r = 0; r < brickRowCount; r++) {
+                var b = bricks[c][r];
+                if (b.status == 1) {
+                    if (powerUp.status == 1) {
+                        // xem gia tri hien tai cua bien x có lon hon x toa do cua power hay khong và nó có nho hon tong toa đo x cua power và chieu rong cua no hay khong
+                        // tuong tu ơ y
+                        // nếu cả 2 đk thoa thì se nam gioi han cua power va thuc hien hanh dong khi va cham
+                        if (x > powerUp.x && x < powerUp.x + powerUp.width && y > powerUp.y && y < powerUp.y + powerUp.height) {
+
+                            dy = -dy; // đổi chiều di chuyển của bóng khi va chạm với power up
+                            powerUp.status = 0;
+                            score += 5; // tăng điểm số khi ăn power up
+                        }
+                        //ktr xem bóng co va cham voi gach hien tai hay khong
+                        // so sánh toa do x, y cua bong với các x, y và chieu rong và chieu cao cua vien gach
+
+                        if (x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {
+                            dy = -dy;
+
+                            b.status = 0;
+                            score++;//diem moi qua bong khi trung gach
+
+
+
+
+                        }
+                        if (score === 18) {
+
+                            alert("CONGRATULATIONS!");
+                            document.location.reload();
+
+                        }
+
+                    }
+
+                }
+
+
+            }
+        }
+
+    }
+
+
+
+
+
+
+        function draw() {// chua các tất cả cac ham de tao nen 1 man game
+            ctx.clearRect(0, 0, canvas.width, canvas.height);// xoa canvas nhuong cho cho khung tiep theo duoc ve
+
+            drawBall();
+            drawPaddle();
+            drawBricks();
+            collDetection();
+            drawScore();
+            drawLives();
+
+// vi tri cua bong
+            x += dx;
+            y += dy;
+
+// kiem tra bong da cham tuong ben trai hay ben phai chưa
+            if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
+                dx = -dx;// nếu có thi doi huong chuyen dong ngang cua bong
+            }
+
+            if (y + dy < ballRadius) {// kiem tra bong co cham vào bưc tuong tren cùng chưa
+                dy = -dy;// nếu có thì doi huong chuyen dong thang cua bong
+            } else if (y + dy > canvas.height - ballRadius) {// ktra khi bong cham vào tuong duoi
+                if (x > paddleX && x < paddleX + paddwidth) {// kiem tra bong co cham thanh truot chưa , neu bong nằm trong chieu rong cua thanh truot, thuong thang dung bị đoi
+                    dy = -dy;
+                } else {// neu khong live giam đi 1
+                    lives--;
+                    if (!lives) {// live = 0 thì game over
+                        alert("GAME OVER");
+                        document.location.reload();
+                        // neu con lives thi vi tri va huong cua bong duoc đặt lại và vi tri thanh truot dat ơ giua
+                        }else {
+                            x = canvas.width / 2;
+                            y = canvas.height - 30;
+                            dx = 2;
+                            dy = -2;
+                            paddleX = (canvas.width - paddwidth) / 2;
+                        }
+
+                }
+            }
+
+
+        }
+
+
+    function draw1() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        drawBall();
+        drawPaddle();
+        drawBricks();
+        collDetection();
+        drawScore();
+        drawLives();
+        moveBrick()
+
+        x += dx;
+        y += dy;
+
+
+        if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
+            dx = -dx;
+        }
+
+        if (y + dy < ballRadius) {
+            dy = -dy;
+        } else if (y + dy > canvas.height - ballRadius) {
+            if (x > paddleX && x < paddleX + paddwidth) {// su kien bong cham tam van
+                dy = -dy;
+            } else {
+                lives--;
+                if (!lives) {
+                    alert("GAME OVER");
+                    document.location.reload();
+                    // Needed for Chrome to end game
+                }else {
+                    x = canvas.width / 2;
+                    y = canvas.height - 30;
+                    dx = 2;
+                    dy = -2;
+                    paddleX = (canvas.width - paddwidth) / 2;
+                }
+
+            }
+        }
+
+
+
+    }
+    function draw2() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        drawBall();
+        drawPaddle();
+        drawBricks();
+        collDetection2();
+        drawScore();
+        drawLives();
+
+
+        x += dx;
+        y += dy;
+
+
+        if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
+            dx = -dx;
+        }
+
+        if (y + dy < ballRadius) {
+            dy = -dy;
+        } else if (y + dy > canvas.height - ballRadius) {
+            if (x > paddleX && x < paddleX + paddwidth) {// su kien bong cham tam van
+                dy = -dy;
+            } else {
+                lives--;
+                if (!lives) {
+                    alert("GAME OVER");
+                    document.location.reload();
+                    // Needed for Chrome to end game
+                }else {
+                    x = canvas.width / 2;
+                    y = canvas.height - 30;
+                    dx = 2;
+                    dy = -2;
+                    paddleX = (canvas.width - paddwidth) / 2;
+                }
+
+            }
+        }
+
+
+    }
+    function draw3() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        drawBall();
+        drawPaddle();
+        drawBricks();
+        collDetection3();
+        drawScore();
+        drawLives();
+        drawBricks1();
+
+        x += dx;
+        y += dy;
+
+
+        if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
+            dx = -dx;
+        }
+
+        if (y + dy < ballRadius) {
+            dy = -dy;
+        } else if (y + dy > canvas.height - ballRadius) {
+            if (x > paddleX && x < paddleX + paddwidth) {// su kien bong cham tam van
+                dy = -dy;
+            } else {
+                lives--;
+                if (!lives) {
+                    alert("GAME OVER");
+                    document.location.reload();
+                    // Needed for Chrome to end game
+                }else {
+                    x = canvas.width / 2;
+                    y = canvas.height - 30;
+                    dx = 2;
+                    dy = -2;
+                    paddleX = (canvas.width - paddwidth) / 2;
+                }
+
+            }
+        }
+
+
+    }
+    function draw4() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        drawBall();
+        drawPaddle();
+        drawBricks();
+
+        drawScore();
+        drawLives();
+        drawPowerUp();
+
+        collDetection4();
+        x += dx;
+        y += dy;
+
+            if (powerUp.status == 0) {
+                // tạo một power up mới ngau nhien
+                powerUp.x = Math.random() * (canvas.width - powerUp.width);//dam bao phan xuat hien khong nam bên ngoai khung
+                powerUp.y = 0;// qua trinh hien thi se ở đầu canvas
+                powerUp.status = 1;// hop qua dg duoc hien thi
+            }
+
+
+        if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
+            dx = -dx;
+        }
+
+        if (y + dy < ballRadius) {
+            dy = -dy;
+        } else if (y + dy > canvas.height - ballRadius) {
+            if (x > paddleX && x < paddleX + paddwidth) {// su kien bong cham tam van
+                dy = -dy;
+            } else {
+                lives--;
+                if (!lives) {
+                    alert("GAME OVER");
+                    document.location.reload();
+                    // Needed for Chrome to end game
+                }else {
+                    x = canvas.width / 2;
+                    y = canvas.height - 30;
+                    dx = 2;
+                    dy = -2;
+                    paddleX = (canvas.width - paddwidth) / 2;
+                }
+
+            }
+        }
+
+
+    }
+
+    function startG2() {
+        setInterval(draw2, 8);
+
+    }
+
+    document.getElementById('next2').addEventListener('click', startG2 );
+
+    // Sử dụng sự kiện "click" để bắt đầu chạy game khi sự kiện xảy ra
+
+
+   document.getElementById('next1').addEventListener('click', startG1 );
+    function startG1() {
+        setInterval(draw1,8);
+
+    }
+    document.getElementById('next3').addEventListener('click', startG3 );
+    function startG3() {
+        setInterval(draw3,8);
+
+    }
+    document.getElementById('next4').addEventListener('click', startG4 );
+    function startG4() {
+        setInterval(draw4,8);
+
+    }
+    document.getElementById('letgo').addEventListener('click', startG );
+    function startG() {
+
+        setInterval(draw,8);
+
+    }
+    // Trong hàm bắt đầu chạy game, bắt đầu vòng lặp game và gọi các hàm để vẽ các đối tượng và cập nhật trạng thái của chúng
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+</body>
+</html>
